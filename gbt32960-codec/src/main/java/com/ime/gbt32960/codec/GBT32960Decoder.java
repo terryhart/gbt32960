@@ -71,11 +71,13 @@ public class GBT32960Decoder extends ReplayingDecoder<Void> {
                 fullBody.release();
                 report.setReissue(header.getRequestType() == RequestType.REISSUE);
                 RealTimeReport timeReport = report.build();
-                log.info("实时信息：{}", timeReport);
-                return report.build();
+                log.info("实时信息：\n\t{}", timeReport);
+                return timeReport;
 
             case LOGIN:
-                return decodeLogin(in);
+                LoginRequest loginRequest = decodeLogin(in);
+                log.info("登入信息: \n{}", loginRequest);
+                return loginRequest;
 
             case CONFIG_SETUP:
                 return readTime(in);
@@ -89,6 +91,12 @@ public class GBT32960Decoder extends ReplayingDecoder<Void> {
             case CLOCK_CORRECT:
             case HEARTBEAT:
                 return null;
+            case LOGOUT:
+                LogoutRequest logout = LogoutRequest.newBuilder()
+                        .setRecordTime(readTime(in))
+                        .setLogoutDaySeq(in.readUnsignedShort()).build();
+                log.info("登出消息: \n{}", logout);
+                return logout;
 
                 default:
                     throw new Error();

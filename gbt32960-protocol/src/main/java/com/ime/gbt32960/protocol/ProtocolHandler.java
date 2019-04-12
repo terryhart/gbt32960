@@ -1,10 +1,9 @@
 package com.ime.gbt32960.protocol;
 
-import com.ime.gbt32960.codec.FrameHeader;
-import com.ime.gbt32960.codec.GBT32960Message;
-import com.ime.gbt32960.codec.ResponseMessage;
-import com.ime.gbt32960.codec.ResponseTag;
+import com.ime.gbt32960.codec.*;
+import com.ime.iov.gbt32960.LoginRequest;
 import com.ime.iov.gbt32960.PlatformMessage;
+import com.ime.iov.gbt32960.ProtoResponse;
 import com.ime.iov.gbt32960.TerminalClockCorrect;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandler;
@@ -12,6 +11,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
 
@@ -19,7 +19,7 @@ import static com.ime.gbt32960.codec.GBT32960Message.emptyResponse;
 /**
  * @author Qingxi
  */
-
+@Slf4j
 @ChannelHandler.Sharable
 public class ProtocolHandler extends ChannelDuplexHandler {
 
@@ -31,8 +31,13 @@ public class ProtocolHandler extends ChannelDuplexHandler {
         GBT32960Message message = (GBT32960Message) msg;
         FrameHeader header = message.getHeader();
         switch (header.getRequestType()) {
+            /*
+            想要测试 登入不成功的情况，只需将 case LOGIN 这段代码注释掉
+             */
             case LOGIN:
-                emptyResponse(ctx, header, ResponseTag.SUCCESS, Instant.now().getEpochSecond());
+                LoginRequest login = (LoginRequest) message.getPayload();
+                log.info("{} 登入成功!", login.getIccid());
+                loginResponse(ctx, header, ResponseTag.SUCCESS, login);
                 break;
             case HEARTBEAT:
                 emptyResponse(ctx, header, ResponseTag.SUCCESS);
@@ -46,6 +51,24 @@ public class ProtocolHandler extends ChannelDuplexHandler {
                 default:
                     ctx.fireChannelRead(msg);
         }
+    }
+
+    /**
+     * 返回 登录成功应答
+     * @param ctx ChannelHandlerContext
+     * @param header 头部
+     * @param tag 登录成功标志
+     * @param loginRequest 登入消息
+     */
+    private void loginResponse(ChannelHandlerContext ctx, FrameHeader header, ResponseTag tag, LoginRequest loginRequest) {
+        PlatformMessage message = PlatformMessage.newBuilder()
+                .setProtoResponse(ProtoResponse.newBuilder()
+                        .setMesssageType(RequestType.LOGIN.getValue())
+                        .setResult(tag.getValue())
+                        .setLogin(loginRequest)
+                        .build())
+                .build();
+        ctx.writeAndFlush(new ResponseMessage(header.getVin(), message));
     }
 
     @Override
