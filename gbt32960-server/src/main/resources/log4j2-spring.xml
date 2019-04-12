@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="OFF">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!--日志格式：
+            时间，精确到毫秒；
+            日志级别：ERROR, WARN, INFO, DEBUG or TRACE；
+            进程ID；
+            分隔符： \-\-\- 标识实际日志的开始
+            线程名：方括号括起来（可能会截断控制台输出）
+            Logger名：通常使用源代码的类名
+            日志内容-->
+            <PatternLayout pattern="%style{%d{yyyy.MM.dd HH:mm:ss.SSS}}{black} %highlight{%-5level} %pid --- [%style{%20.20t}{bright,blue}] %style{%-40.40C{1.}}{bright,yellow} : %msg%n%throwable"/>
+        </Console>
+        <File name="ERROR" fileName="gbt32960_logs/error.log" append="true">
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="%d{yyyy.MM.dd HH:mm:ss.SSS} %-5level %pid --- [%20.20t] %-40.40C{1.} : %msg%n%throwable"/>
+        </File>
+        <RollingFile name="RollingFile" fileName="gbt32960_logs/upload_message.log"
+                     filePattern="gbt32960_logs/upload_message-%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="NATURAL"/>
+            <PatternLayout pattern="%d{yyyy.MM.dd HH:mm:ss.SSS} %-5level %pid --- [%20.20t] %-40.40C{1.} : %msg%n%throwable"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" />
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <appender-ref ref="ERROR" />
+            <appender-ref ref="RollingFile"/>
+            <appender-ref ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

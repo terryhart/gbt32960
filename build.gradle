@@ -1,0 +1,48 @@
+plugins {
+    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id "net.ltgt.apt" version "0.18"
+}
+
+subprojects {
+    group 'ime'
+    version '1.0'
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: "net.ltgt.apt-idea"
+    
+    sourceCompatibility = 1.8
+    
+    configurations {
+        all {
+            exclude module: 'spring-boot-starter-logging'
+        }
+    }
+    
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    
+    dependencies {
+        compile 'com.google.guava:guava:25.1-jre'
+        compile "org.projectlombok:lombok:1.18.2"
+        annotationProcessor "org.projectlombok:lombok:1.18.2"
+
+        testCompile 'org.junit.jupiter:junit-jupiter-engine:5.1.0'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE"
+            mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Finchley.RELEASE'
+        }
+    }
+
+    compileJava {
+        options.encoding = 'UTF-8'
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+    
+}

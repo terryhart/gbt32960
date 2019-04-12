@@ -1,0 +1,9 @@
+
+
+dependencies {
+    compile project(':gbt32960-message')
+    compile group: 'io.netty', name: 'netty-handler', version: '4.1.30.Final'
+    compile group: 'io.netty', name: 'netty-codec-http', version: '4.1.30.Final'
+
+    compile "org.slf4j:slf4j-api:1.7.25"
+}

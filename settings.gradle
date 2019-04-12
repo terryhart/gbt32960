@@ -1,0 +1,6 @@
+rootProject.name = 'gbt32960'
+include 'gbt32960-message'
+include 'gbt32960-codec'
+include 'gbt32960-protocol'
+include 'gbt32960-server'
+
