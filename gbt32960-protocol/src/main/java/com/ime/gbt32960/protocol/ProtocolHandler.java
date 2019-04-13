@@ -14,7 +14,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 
+import static com.ime.gbt32960.codec.GBT32960Message.ZONE_UTC8;
 import static com.ime.gbt32960.codec.GBT32960Message.emptyResponse;
 /**
  * @author Qingxi
@@ -67,7 +69,7 @@ public class ProtocolHandler extends ChannelDuplexHandler {
                         .setLogin(loginRequest)
                         .build())
                 .build();
-        log.info("返回登入成功消息: \n{}", message);
+        log.info("返回登入成功消息: \n数据采集时间:{}\n{}", ZonedDateTime.ofInstant(Instant.ofEpochSecond(message.getProtoResponse().getLogin().getRecordTime()), ZONE_UTC8),message);
         log.info("{} 登入成功!", header.getVin());
         ctx.writeAndFlush(new ResponseMessage(header.getVin(), message));
     }

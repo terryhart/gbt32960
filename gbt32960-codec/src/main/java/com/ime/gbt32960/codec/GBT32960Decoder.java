@@ -7,6 +7,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.ime.gbt32960.codec.FrameHeader.HEADER_LENGTH;
@@ -71,12 +73,12 @@ public class GBT32960Decoder extends ReplayingDecoder<Void> {
                 fullBody.release();
                 report.setReissue(header.getRequestType() == RequestType.REISSUE);
                 RealTimeReport timeReport = report.build();
-                log.info("实时信息：\n\t{}", timeReport);
+                log.info("实时信息：\n数据采集时间:{}\n{}", ZonedDateTime.ofInstant(Instant.ofEpochSecond(timeReport.getRecordTime()), ZONE_UTC8), timeReport);
                 return timeReport;
 
             case LOGIN:
                 LoginRequest loginRequest = decodeLogin(in);
-                log.info("登入信息: \n{}", loginRequest);
+                log.info("登入信息: \n数据采集时间:{}\n{}", ZonedDateTime.ofInstant(Instant.ofEpochSecond(loginRequest.getRecordTime()), ZONE_UTC8), loginRequest);
                 return loginRequest;
 
             case CONFIG_SETUP:
@@ -95,7 +97,7 @@ public class GBT32960Decoder extends ReplayingDecoder<Void> {
                 LogoutRequest logout = LogoutRequest.newBuilder()
                         .setRecordTime(readTime(in))
                         .setLogoutDaySeq(in.readUnsignedShort()).build();
-                log.info("登出消息: \n{}", logout);
+                log.info("登出消息: \n数据采集时间:{}\n{}", ZonedDateTime.ofInstant(Instant.ofEpochSecond(logout.getRecordTime()), ZONE_UTC8),logout);
                 return logout;
 
                 default:
