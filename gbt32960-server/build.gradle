@@ -1,8 +1,4 @@
-plugins {
-    id 'org.springframework.boot' version '2.0.5.RELEASE'
-}
 
-apply plugin: "org.springframework.boot"
 
 dependencies {
     compile project(":gbt32960-protocol")
