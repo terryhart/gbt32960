@@ -36,7 +36,6 @@ public class ProtocolHandler extends ChannelDuplexHandler {
              */
             case LOGIN:
                 LoginRequest login = (LoginRequest) message.getPayload();
-                log.info("{} 登入成功!", login.getIccid());
                 loginResponse(ctx, header, ResponseTag.SUCCESS, login);
                 break;
             case HEARTBEAT:
@@ -68,6 +67,8 @@ public class ProtocolHandler extends ChannelDuplexHandler {
                         .setLogin(loginRequest)
                         .build())
                 .build();
+        log.info("返回登入成功消息: \n{}", message);
+        log.info("{} 登入成功!", header.getVin());
         ctx.writeAndFlush(new ResponseMessage(header.getVin(), message));
     }
 
