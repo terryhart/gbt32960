@@ -239,7 +239,7 @@ public class ReportDecoder {
                 .setCurrent(in.readShort() / 10.0f - 1000)
                 .setBatteryTotalCount(in.readUnsignedShort())
                 .setFrameStartBatterySeq(in.readUnsignedShort());
-        int count = in.readByte();
+        int count = in.readByte() & 0xFF;//fix for count between 128-200
         for (int i = 0; i < count; i++) {
             builder.addBatteryVoltage(in.readUnsignedShort() / 1000.0f);
         }
